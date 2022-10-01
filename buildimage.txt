@@ -23,9 +23,13 @@ git checkout origin/am33x-v5.4 -b tmp
 #Lần build kernel đầu tiên
 ./build_kernel.sh
 
+# save and exit
+
 #Tải và giải nén rootfs
+cd ../
 wget -c https://rcn-ee.com/rootfs/eewiki/minfs/debian-10.10-minimal-armhf-2021-06-20.tar.xz
 tar xf debian-10.10-minimal-armhf-2021-06-20.tar.xz
+rm debian-10.10-minimal-armhf-2021-06-20.tar.xz
 
 #Erase sdcard
 export DISK=/dev/sdb
@@ -36,6 +40,7 @@ sudo dd if=./u-boot/MLO of=${DISK} count=1 seek=1 bs=128k
 sudo dd if=./u-boot/u-boot.img of=${DISK} count=2 seek=1 bs=384k
 
 #Create Partition Layout
+sudo sfdisk --version     : nếu lến hớn 2.26 thì 
 sudo sfdisk ${DISK} <<-__EOF__
 4M,,L,*
 __EOF__
@@ -43,6 +48,7 @@ __EOF__
 sudo mkfs.ext4 -L rootfs -O ^metadata_csum,^64bit ${DISK}1
 
 #write data to sdcard
+Click chuột phải vào vantho15->removeable Device -> super top mas store device -> connect
 sudo mkdir -p /media/rootfs/
 sudo mount ${DISK}1 /media/rootfs/
 
@@ -50,7 +56,17 @@ sudo mkdir -p /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/MLO /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/u-boot.img /media/rootfs/opt/backup/uboot/
 
+# sửa code 
+cd bb-kernel
+cd KERNEL
+vim drivers/watchdog/omap_wdt.c
+ctr F probe
+thêm printk(KERN_EMERG "ThoNV %s, %d\n", __func__, __LINE__);
+cd ..
+./tools/rebuild.sh
+exit
 export kernel_version=5.4.129-bone55
+cd ..
 
 sudo tar xfvp ./debian-*-*-armhf-*/armhf-rootfs-*.tar -C /media/rootfs/
 sync
