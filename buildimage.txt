@@ -65,7 +65,7 @@ thêm printk(KERN_EMERG "ThoNV %s, %d\n", __func__, __LINE__);
 cd ..
 ./tools/rebuild.sh
 exit
-export kernel_version=5.4.129-bone55
+export kernel_version=5.4.209-bone65
 cd ..
 
 sudo tar xfvp ./debian-*-*-armhf-*/armhf-rootfs-*.tar -C /media/rootfs/
