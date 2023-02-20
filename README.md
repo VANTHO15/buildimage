@@ -62,10 +62,12 @@ cd bb-kernel
 cd KERNEL/
 vim drivers/watchdog/omap_wdt.c
 ![image](https://user-images.githubusercontent.com/56969447/220155805-15316928-bc11-4caa-af65-129f9fd79dd2.png)
-
+cd ..
+./tools/rebuild.sh
 
 export kernel_version=5.4.129-bone55
 
+cd ..
 sudo tar xfvp ./debian-*-*-armhf-*/armhf-rootfs-*.tar -C /media/rootfs/
 sync
 sudo chown root:root /media/rootfs/
