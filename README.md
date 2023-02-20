@@ -80,8 +80,8 @@ sudo tar xfv ./bb-kernel/deploy/${kernel_version}-dtbs.tar.gz -C /media/rootfs/b
 sudo tar xfv ./bb-kernel/deploy/${kernel_version}-modules.tar.gz -C /media/rootfs/
 sudo sh -c "echo '/dev/mmcblk0p1  /  auto  errors=remount-ro  0  1' >> /media/rootfs/etc/fstab"
 
-sudo nano /media/rootfs/etc/network/interfaces
-#/etc/network/interfaces
+sudo vim /media/rootfs/etc/network/interfaces
+# sau đó thêm vào 4 dòng dưới
 auto lo
 iface lo inet loopback
  
