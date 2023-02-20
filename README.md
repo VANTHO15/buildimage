@@ -26,6 +26,7 @@ git checkout origin/am33x-v5.4 -b tmp
 ./build_kernel.sh
 
 #Tải và giải nén rootfs
+cd ../
 wget -c https://rcn-ee.com/rootfs/eewiki/minfs/debian-10.10-minimal-armhf-2021-06-20.tar.xz
 tar xf debian-10.10-minimal-armhf-2021-06-20.tar.xz
 
