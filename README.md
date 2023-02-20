@@ -30,7 +30,6 @@ cd ../
 wget -c https://rcn-ee.com/rootfs/eewiki/minfs/debian-10.10-minimal-armhf-2021-06-20.tar.xz
 tar xvf debian-10.10-minimal-armhf-2021-06-20.tar.xz
 
-username: ubuntu   pass: tempwd
 
 #Erase sdcard
 export DISK=/dev/sdb
@@ -92,3 +91,5 @@ sync
 sudo umount /media/rootfs
 
 # sau khi xong thì cắm thẻ vào bbb và giữ nút s2 trước khi cắm nguồn, để nạp vào, chứ không thì nó nạp chương trình mặc định của nó
+username: debian   pass: tempwd
+dmesh | grep thonv ( kiểm tra xem có cái log mà ta điền vào không )
