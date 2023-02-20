@@ -51,6 +51,8 @@ sudo mkfs.ext4 -L rootfs -O ^metadata_csum,^64bit ${DISK}1
 sudo mkdir -p /media/rootfs/
 sudo mount ${DISK}1 /media/rootfs/
 
+# gox lsblk để kiểm tra dã mount được chưa
+
 sudo mkdir -p /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/MLO /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/u-boot.img /media/rootfs/opt/backup/uboot/
