@@ -14,6 +14,8 @@ make ARCH=arm CROSS_COMPILE=${CC} distclean
 make ARCH=arm CROSS_COMPILE=${CC} am335x_evm_defconfig
 make ARCH=arm CROSS_COMPILE=${CC}
 
+# hiện lỗi thì: sudo apt-get install bison     và sau đó      sudo apt-get install flex         là hết lỗi
+
 #Tải code linux và apply patch
 cd ../
 git clone https://github.com/RobertCNelson/bb-kernel
