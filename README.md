@@ -90,3 +90,5 @@ iface eth0 inet dhcp
 
 sync
 sudo umount /media/rootfs
+
+# sau khi xong thì cắm thẻ vào bbb và giữ nút s2 trước khi cắm nguồn, để nạp vào, chứ không thì nó nạp chương trình mặc định của nó
