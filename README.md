@@ -30,6 +30,8 @@ cd ../
 wget -c https://rcn-ee.com/rootfs/eewiki/minfs/debian-10.10-minimal-armhf-2021-06-20.tar.xz
 tar xvf debian-10.10-minimal-armhf-2021-06-20.tar.xz
 
+username: ubuntu   pass: tempwd
+
 #Erase sdcard
 export DISK=/dev/sdb
 sudo dd if=/dev/zero of=${DISK} bs=1M count=10
