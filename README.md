@@ -57,6 +57,13 @@ sudo mkdir -p /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/MLO /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/u-boot.img /media/rootfs/opt/backup/uboot/
 
+# chèn log vào wdg module:
+cd bb-kernel
+cd KERNEL/
+vim drivers/watchdog/omap_wdt.c
+![image](https://user-images.githubusercontent.com/56969447/220155805-15316928-bc11-4caa-af65-129f9fd79dd2.png)
+
+
 export kernel_version=5.4.129-bone55
 
 sudo tar xfvp ./debian-*-*-armhf-*/armhf-rootfs-*.tar -C /media/rootfs/
