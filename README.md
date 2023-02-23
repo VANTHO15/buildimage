@@ -92,4 +92,4 @@ sudo umount /media/rootfs
 
 # sau khi xong thì cắm thẻ vào bbb và giữ nút s2 trước khi cắm nguồn, để nạp vào, chứ không thì nó nạp chương trình mặc định của nó
 username: debian   pass: tempwd
-dmesh | grep thonv ( kiểm tra xem có cái log mà ta điền vào không )
+dmesg | grep thonv ( kiểm tra xem có cái log mà ta điền vào không )
