@@ -15,6 +15,8 @@ make ARCH=arm CROSS_COMPILE=${CC} distclean
 make ARCH=arm CROSS_COMPILE=${CC} am335x_evm_defconfig
 make ARCH=arm CROSS_COMPILE=${CC}
 
+# hiện lỗi thì: sudo apt-get install bison     và sau đó      sudo apt-get install flex         là hết lỗi
+
 #Tải code linux và apply patch
 cd ../
 git clone https://github.com/RobertCNelson/bb-kernel
@@ -24,13 +26,11 @@ git checkout origin/am33x-v5.4 -b tmp
 #Lần build kernel đầu tiên
 ./build_kernel.sh
 
-# save and exit
-
 #Tải và giải nén rootfs
 cd ../
 wget -c https://rcn-ee.com/rootfs/eewiki/minfs/debian-10.10-minimal-armhf-2021-06-20.tar.xz
-tar xf debian-10.10-minimal-armhf-2021-06-20.tar.xz
-rm debian-10.10-minimal-armhf-2021-06-20.tar.xz
+tar xvf debian-10.10-minimal-armhf-2021-06-20.tar.xz
+
 
 #Erase sdcard
 export DISK=/dev/sdb
@@ -41,7 +41,6 @@ sudo dd if=./u-boot/MLO of=${DISK} count=1 seek=1 bs=128k
 sudo dd if=./u-boot/u-boot.img of=${DISK} count=2 seek=1 bs=384k
 
 #Create Partition Layout
-sudo sfdisk --version     : nếu lến hớn 2.26 thì 
 sudo sfdisk ${DISK} <<-__EOF__
 4M,,L,*
 __EOF__
@@ -49,25 +48,26 @@ __EOF__
 sudo mkfs.ext4 -L rootfs -O ^metadata_csum,^64bit ${DISK}1
 
 #write data to sdcard
-Click chuột phải vào vantho15->removeable Device -> super top mas store device -> connect
 sudo mkdir -p /media/rootfs/
 sudo mount ${DISK}1 /media/rootfs/
+
+# gox lsblk để kiểm tra dã mount được chưa
 
 sudo mkdir -p /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/MLO /media/rootfs/opt/backup/uboot/
 sudo cp -v ./u-boot/u-boot.img /media/rootfs/opt/backup/uboot/
 
-# sửa code 
+# chèn log vào wdg module:
 cd bb-kernel
-cd KERNEL
+cd KERNEL/
 vim drivers/watchdog/omap_wdt.c
-ctr F probe
-thêm printk(KERN_EMERG "ThoNV %s, %d\n", __func__, __LINE__); ở đầu func omap_wdt_probe
+![image](https://user-images.githubusercontent.com/56969447/220155805-15316928-bc11-4caa-af65-129f9fd79dd2.png)
 cd ..
-./tools/rebuild.sh  sau đó chọn save -> Exit
-export kernel_version=5.4.209-bone65
-cd ..
+./tools/rebuild.sh
 
+export kernel_version=5.4.129-bone55
+
+cd ..
 sudo tar xfvp ./debian-*-*-armhf-*/armhf-rootfs-*.tar -C /media/rootfs/
 sync
 sudo chown root:root /media/rootfs/
@@ -81,7 +81,7 @@ sudo tar xfv ./bb-kernel/deploy/${kernel_version}-modules.tar.gz -C /media/rootf
 sudo sh -c "echo '/dev/mmcblk0p1  /  auto  errors=remount-ro  0  1' >> /media/rootfs/etc/fstab"
 
 sudo vim /media/rootfs/etc/network/interfaces
-#/etc/network/interfaces
+# sau đó thêm vào 4 dòng dưới
 auto lo
 iface lo inet loopback
  
@@ -91,4 +91,6 @@ iface eth0 inet dhcp
 sync
 sudo umount /media/rootfs
 
-/home/thonv/work/beagle_bone_black/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc -o app hello.c
+# sau khi xong thì cắm thẻ vào bbb và giữ nút s2 trước khi cắm nguồn, để nạp vào, chứ không thì nó nạp chương trình mặc định của nó
+username: debian   pass: tempwd
+dmesg | grep thonv ( kiểm tra xem có cái log mà ta điền vào không )
