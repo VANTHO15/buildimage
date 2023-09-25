@@ -23,8 +23,11 @@ git clone https://github.com/RobertCNelson/bb-kernel
 cd bb-kernel/
 git checkout origin/am33x-v5.4 -b tmp
 
-#Lần build kernel đầu tiên
+#Lần build kernel đầu tiên   
+# hiện lỗi thì: sudo apt install lzop 
+# hiện lỗi thì: sudo apt-get install build-essential fakeroot lzma gettext libmpc-dev u-boot-tools libncurses5-dev:amd64 libssl-dev:amd64
 ./build_kernel.sh
+
 
 #Tải và giải nén rootfs
 cd ../
