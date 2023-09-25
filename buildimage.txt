@@ -64,6 +64,13 @@ sudo cp -v ./u-boot/u-boot.img /media/rootfs/opt/backup/uboot/
 cd bb-kernel
 cd KERNEL/
 vim drivers/watchdog/omap_wdt.c
+#static int omap_wdt_probe(struct platform_device *pdev)
+#{
+#        struct omap_wd_timer_platform_data *pdata = dev_get_platdata(&pdev->dev);
+#        struct omap_wdt_dev *wdev;
+#        int ret;
+#        printk(KERN_EMERG "ThoNV12 %s, %d\n", __func__, __LINE__);
+
 ![image](https://user-images.githubusercontent.com/56969447/220155805-15316928-bc11-4caa-af65-129f9fd79dd2.png)
 cd ..
 ./tools/rebuild.sh
