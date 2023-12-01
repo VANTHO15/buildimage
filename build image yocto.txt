@@ -1,0 +1,172 @@
+sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev     pylint3 xterm
+
+sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm rsync curl
+
+sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit mesa-common-dev zstd liblz4-tool
+
+
+
+https://github.com/orgs/nxp-imx/repositories   
+https://github.com/orgs/MYiR-Dev/repositories 
+
+
+1: set up môi trường gg repo
+mkdir -p ~/.bin
+PATH="${HOME}/.bin:${PATH}"
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
+chmod a+rx ~/.bin/repo
+git config --global user.email "nguyenvantho.com"
+git config --global user.name "thonv12"
+
+(Sau đó replace file repo của mình vào )
+
+2: bắt đầu
+mkdir yocto_imx
+cd yocto_imx
+" Myir lỗi thì dùng NXP: repo init -u https://github.com/MYiR-Dev/myir-imx-manifest.git --no-clone-bundle --depth=1 -m myir-i.mx8m-5.4.3-2.0.0.xml -b i.MX8M-5.4-zeus "
+repo init -u https://github.com/nxp-imx/imx-manifest.git --no-clone-bundle -m imx-5.4.3-1.0.0.xml -b imx-linux-zeus
+repo sync
+
+"Gõ source setup-environment : sẽ có hướng dẫn hiện ra bên dưới"
+"""""
+Usage: MACHINE=<machine> DISTRO=<distro> source setup-environment <build-dir>
+Usage:                                   source setup-environment <build-dir>
+    <machine>    machine name
+    <distro>     distro name
+    <build-dir>  build directory
+"""""
+
+MACHINE=imx8mmevk DISTRO=fslc-wayland source setup-environment build_imx8mmevk
+"bitbake myir-image-full --runall=fetch"
+"Check image của DISTRO=fslc-wayland tại /home/thonv12/yocto_imx_nxp/sources/meta-freescale-distro/recipes-fsl/images "
+bitbake fsl-image-machine-test
+
+cd source
+vim ~/.gitconfig
+"Paste vào cuối file là được"
+[url "https://github.com/nxp-imx/"]
+        insteadof = https://source.codeaurora.org/external/imx/
+        insteadof = git://source.codeaurora.org/external/imx/
+[url "https://github.com/nxp-imx/linux-imx"]
+        insteadof = git://source.codeaurora.org/external/imx/linux-imx
+
+
+
+
+
+" gstreamer.git "
+
+Boot Sequence
+-------------
+
+Bootrom --> SPL --> BL31 --> BL33(u-boot) --> Linux kernel
+
+0. Tai ARM Trusted firmware
+mkdir ARM-Trusted-firmware
+cd ARM-Trusted-firmware
+git clone https://github.com/nxp-imx/imx-atf.git
+cd imx-atf
+git checkout -b imx_4.19.35_1.1.0 origin/imx_4.19.35_1.1.0
+
+-------------
+1. tool chain
+mkdir Toolchain
+cd Toolchain
+sudo chmod 0777 fsl-imx-xwayland-glibc-x86_64-meta-toolchain-aarch64-myd-imx8mm-toolchain-5.4-zeus.sh
+./fsl-imx-xwayland-glibc-x86_64-meta-toolchain-aarch64-myd-imx8mm-toolchain-5.4-zeus.sh
+/home/thonv12/Desktop/imx8mm/Toolchain : enter path to Toolchain
+source ./environment-setup-aarch64-poky-linux   : save bien moi truong de dung
+export: xem bien moi truong
+-------------
+
+2. build bl31  
+cd imx-atf
+make PLAT=imx8mn bl31
++ khi nay build error: khi gõ export ta sẽ thấy có các cờ (LDFLAGS="-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed") khi này xoá cờ đi
+unset LDFLAGS  
+make PLAT=imx8mn bl31 : sau đó make lại 
+
+3. uboot
+mkdir imx-boot-bin
+cd imx-boot-bin
+git clone https://github.com/nxp-imx/uboot-imx.git
+cd uboot-imx 
+make distclean
+make imx8mm_ddr4_evk_defconfig ( nếu lỗi thì chạy sudo apt-get install libncurses-dev)
+make menuconfig  : tìm delay và chọn 5s
+make -j4
+file dtb là : imx8mn-ddr4-evk.dtb   ( source để build ra .dtb là imx8mn-ddr4-evk.dts)
+
+
+4. imx-mkimage 
+mkdir imx-mkimage 
+cd imx-mkimage 
+git clone https://github.com/nxp-imx/imx-mkimage.git
+
+5. firmware
+mkdir Firmware 
+cd Firmware
+copy folder firmware-imx-8.7 vào hoặc git clone https://github.com/nxp-imx/imx-firmware.git
+
+
+6. sau đó đi copy các cái càn thiết bỏ vào imx-image này, dùng tool cho nhanh
+ở đâu cũng được
+./make-uboot-emmc.sh 
+
+7. image 
+mkdir image 
+cd image
+copy /Desktop/imx8mm/imx-mkimage/imx-mkimage/iMX8M/flash.bin vao ddaay
+
+8. create sd card
+cd image 
+./dl_sdcard.sh
+
+
+
+
+
+
+
+
+0101 0101: boot from MMC
+setenv bootdelay 10
+savenv
+
+
+
+===================================================================================
+Create SDcard.
+
+$ sudo dd if=flash.bin of=/dev/sdb bs=1k seek=33 conv=fsync
+
+Where offset is:
+• 1 - for i.MX 6 or i.MX 7
+• 33 - for i.MX 8QuadMax A0, i.MX 8QuadXPlus A0, i.MX 8M Quad, and i.MX 8M Mini
+• 32 - for i.MX 8QuadXPlus B0, i.MX 8QuadMax B0, and i.MX 8M Nano
+
+
+
+
+
+
+
+
+0. tool chain
+https://developer.arm.com/downloads/-/gnu-a
+ctrl F: tìm bản ni tải về : gcc-arm-10.3-2021.07-x86_64-aarch64-none-elf.tar.xz
+
+1. Tải và Build u-boot:
+mkdir imx-boot-bin
+cd imx-boot-bin
+git clone https://github.com/nxp-imx/uboot-imx.git
+cd uboot-imx/
+git checkout -b imx_v2019.04_4.19.35_1.1.0 origin/imx_v2019.04_4.19.35_1.1.0
+export ARCH=arm
+sudo make clean
+sudo make imx8mm_evk_defconfig
+sudo make ARCH=arm CROSS_COMPILE=/home/thonv12/Desktop/imx8mm/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu- -j4
+
+
+
+
